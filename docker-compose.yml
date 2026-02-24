@@ -10,7 +10,7 @@ services:
       MYSQL_USER: soy
       MYSQL_PASSWORD: soy
     ports:
-      - "3306:3306"
+      - "3333:3333"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-usoy", "-psoy"]
@@ -24,7 +24,7 @@ services:
       - "8000:8000"
     environment:
       MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
+      MYSQL_PORT: 3333
       MYSQL_USER: soy
       MYSQL_PASSWORD: soy
       MYSQL_DATABASE: soydb
