@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>SoyAdmin</string>
+   <string>Soy-PC</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QStackedLayout" name="stackedLayout">

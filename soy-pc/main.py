@@ -43,7 +43,7 @@ def main() -> None:
     app.setStyleSheet(FACTORY_STYLESHEET)  # 메인·팝업 공통 테마
 
     window = FluentWidget()
-    window.setWindowTitle("SoyAdmin")
+    window.setWindowTitle("Soy-PC")
     window.resize(800, 600)
     window.setMicaEffectEnabled(False)
     window.setCustomBackgroundColor(QColor(BG_MAIN), QColor(BG_MAIN))
@@ -92,5 +92,5 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         traceback.print_exc()
-        print("SoyAdmin 시작 실패:", e, file=sys.stderr, flush=True)
+        print("Soy-PC 시작 실패:", e, file=sys.stderr, flush=True)
         sys.exit(1)

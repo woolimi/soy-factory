@@ -53,8 +53,8 @@ QPushButton {{
   background-color: {BG_BUTTON};
   color: {TEXT_PRIMARY};
   border: 1px solid {BORDER};
-  padding: 10px 16px;
-  min-height: 22px;
+  padding: 5px 12px;
+  min-height: 18px;
   border-radius: 6px;
   font-weight: 500;
 }}
@@ -121,8 +121,8 @@ QDialog QPushButton#button_ok {{
   background-color: {ACCENT};
   color: white;
   border: none;
-  min-width: 88px;
-  min-height: 36px;
+  min-width: 72px;
+  min-height: 28px;
 }}
 QDialog QPushButton#button_ok:hover {{
   background-color: {ACCENT_HOVER};
@@ -135,15 +135,15 @@ QDialog QPushButton#button_ok:disabled {{
 QDialog QPushButton#button_cancel {{
   background-color: {BG_BUTTON};
   color: {TEXT_SECONDARY};
-  min-width: 80px;
-  min-height: 36px;
+  min-width: 64px;
+  min-height: 28px;
 }}
 QDialog QPushButton#button_edit {{
   background-color: {ACCENT};
   color: white;
   border: none;
-  min-width: 72px;
-  min-height: 36px;
+  min-width: 56px;
+  min-height: 28px;
   border-radius: 6px;
 }}
 QDialog QPushButton#button_edit:hover {{
@@ -153,8 +153,8 @@ QDialog QPushButton#button_delete {{
   background-color: {BG_BUTTON};
   color: {TEXT_PRIMARY};
   border: 1px solid {BORDER};
-  min-width: 72px;
-  min-height: 36px;
+  min-width: 56px;
+  min-height: 28px;
   border-radius: 6px;
 }}
 QDialog QPushButton#button_delete:hover {{
@@ -163,8 +163,8 @@ QDialog QPushButton#button_delete:hover {{
 QDialog QPushButton#button_close {{
   background-color: {BG_BUTTON};
   color: {TEXT_SECONDARY};
-  min-width: 72px;
-  min-height: 36px;
+  min-width: 56px;
+  min-height: 28px;
   border-radius: 6px;
 }}
 QDialog QPushButton#button_close:hover {{
@@ -277,7 +277,8 @@ QWidget#AdminScreen QPushButton#addWorkerButton {{
   background-color: {ACCENT};
   color: white;
   border: none;
-  min-height: 40px;
+  min-height: 30px;
+  padding: 5px 12px;
   border-radius: 8px;
   font-size: 13px;
 }}
