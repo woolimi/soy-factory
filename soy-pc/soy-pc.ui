@@ -6,25 +6,524 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1200</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>입고 물류 자동 분류 시스템</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>37</height>
-    </rect>
-   </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="main_layout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QStackedWidget" name="main_stack">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="page_standby">
+       <layout class="QVBoxLayout" name="verticalLayout_standby">
+        <item>
+         <spacer name="verticalSpacer_1">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_worker">
+          <item>
+           <spacer name="horizontalSpacer_1">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_worker">
+            <property name="minimumSize">
+             <size>
+              <width>300</width>
+              <height>300</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string>
+QPushButton {
+    font-size: 32px;
+    font-weight: bold;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 15px;
+}
+QPushButton:hover { background-color: #45a049; }
+             </string>
+            </property>
+            <property name="text">
+             <string>작업자
+(Worker)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_manager">
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_manager">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string>
+QPushButton {
+    font-size: 16px;
+    background-color: #607D8B;
+    color: white;
+    border-radius: 5px;
+}
+QPushButton:hover { background-color: #546E7A; }
+             </string>
+            </property>
+            <property name="text">
+             <string>관리자 (Manager)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      
+      <widget class="QWidget" name="page_worker">
+       <layout class="QVBoxLayout" name="verticalLayout_worker">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_wheader">
+          <item>
+           <widget class="QLabel" name="label_wtitle">
+            <property name="font">
+             <font>
+              <pointsize>20</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>작업자 모니터링 화면 (Worker Dashboard)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_w1">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_worker_back">
+            <property name="text">
+             <string>← 대기 화면으로</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QFrame" name="frame_monitor">
+          <property name="styleSheet">
+           <string>background-color: #f0f4c3; border: 1px solid #cddc39; border-radius: 10px;</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_monitor">
+           <item>
+            <widget class="QLabel" name="label_mtitle">
+             <property name="text">
+              <string>실시간 모니터링 (Real-time Process)</string>
+             </property>
+             <property name="styleSheet">
+              <string>font-size: 18px; font-weight: bold; border: none;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_flow">
+             <item>
+              <widget class="QLabel" name="label_flow_standby">
+               <property name="text">
+                <string>대기</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="styleSheet">
+                <string>font-size: 16px; padding: 10px; background-color: #e0e0e0; border-radius: 5px;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_arrow1">
+               <property name="text">
+                <string> ➔ </string>
+               </property>
+               <property name="styleSheet"><string>font-size: 20px; font-weight: bold; border: none;</string></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_flow_class">
+               <property name="text">
+                <string>분류</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="styleSheet">
+                <string>font-size: 18px; font-weight: bold; padding: 10px; background-color: #4CAF50; color: white; border-radius: 5px;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_arrow2">
+               <property name="text">
+                <string> ➔ </string>
+               </property>
+               <property name="styleSheet"><string>font-size: 20px; font-weight: bold; border: none;</string></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_flow_inspect">
+               <property name="text">
+                <string>검수</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="styleSheet">
+                <string>font-size: 16px; padding: 10px; background-color: #e0e0e0; border-radius: 5px;</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_pause">
+             <property name="text">
+              <string>⏸ 일시정지 (PAUSED)</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="styleSheet">
+              <string>font-size: 16px; font-weight: bold; color: white; background-color: #f44336; padding: 5px 10px; border-radius: 5px;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_toggle_pause">
+             <property name="text">
+              <string>일시정지 토글 (Mock)</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="frame_stats">
+          <property name="styleSheet">
+           <string>background-color: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px;</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_stats">
+           <item>
+            <widget class="QLabel" name="label_stitle">
+             <property name="text">
+              <string>분류 현황 집계 (Classification Stats)</string>
+             </property>
+             <property name="styleSheet">
+              <string>font-size: 18px; font-weight: bold; border: none;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QGridLayout" name="gridLayout_stats">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_s1">
+               <property name="text"><string>대기 물류 수량 (Standby):</string></property>
+               <property name="styleSheet"><string>border: none;</string></property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="lbl_standby_count">
+               <property name="text"><string>150 건</string></property>
+               <property name="styleSheet"><string>font-size: 16px; font-weight: bold; color: #1565c0; border: none;</string></property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QLabel" name="label_s2">
+               <property name="text"><string>항목별 분류 (By Category):</string></property>
+               <property name="styleSheet"><string>border: none; margin-top: 10px;</string></property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_s3">
+               <property name="text"><string>- Category A (Box):</string></property>
+               <property name="styleSheet"><string>border: none;</string></property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="label_s4">
+               <property name="text"><string>45 건</string></property>
+               <property name="styleSheet"><string>border: none;</string></property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_s5">
+               <property name="text"><string>- Category B (Bag):</string></property>
+               <property name="styleSheet"><string>border: none;</string></property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="label_s6">
+               <property name="text"><string>30 건</string></property>
+               <property name="styleSheet"><string>border: none;</string></property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_stats">
+             <property name="orientation"><enum>Qt::Vertical</enum></property>
+             <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+
+      <widget class="QWidget" name="page_manager_login">
+       <layout class="QVBoxLayout" name="verticalLayout_login">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_lheader">
+          <item>
+           <widget class="QPushButton" name="btn_manager_back">
+            <property name="text"><string>← 대기 화면으로</string></property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_l1">
+            <property name="orientation"><enum>Qt::Horizontal</enum></property>
+            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_l1"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property></spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_lcenter">
+          <item>
+           <spacer name="horizontalSpacer_l2"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame_login">
+            <property name="minimumSize"><size><width>400</width><height>300</height></size></property>
+            <property name="styleSheet"><string>background-color: white; border: 1px solid #ccc; border-radius: 10px;</string></property>
+            <layout class="QVBoxLayout" name="verticalLayout_lform">
+             <item>
+              <widget class="QLabel" name="label_ltitle">
+               <property name="text"><string>관리자 로그인 (Admin Login)</string></property>
+               <property name="alignment"><set>Qt::AlignCenter</set></property>
+               <property name="styleSheet"><string>font-size: 20px; font-weight: bold; border: none;</string></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="input_password">
+               <property name="placeholderText"><string>비밀번호 (아무 문자나 입력)</string></property>
+               <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+               <property name="styleSheet"><string>font-size: 16px; padding: 5px;</string></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btn_login">
+               <property name="text"><string>로그인</string></property>
+               <property name="styleSheet"><string>background-color: #2196F3; color: white; border-radius: 5px; font-size: 16px; font-weight: bold; padding: 10px;</string></property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_l3"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_l2"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property></spacer>
+        </item>
+       </layout>
+      </widget>
+
+      <widget class="QWidget" name="page_manager_dashboard">
+       <layout class="QVBoxLayout" name="verticalLayout_dashboard">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_dheader">
+          <item>
+           <widget class="QLabel" name="label_dtitle">
+            <property name="text"><string>관리자 대시보드 (Admin Dashboard)</string></property>
+            <property name="styleSheet"><string>font-size: 24px; font-weight: bold;</string></property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_d1"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_logout">
+            <property name="text"><string>로그아웃</string></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_issue_id">
+          <property name="text"><string>🪪 ID 카드 발급 (Issue ID Card)</string></property>
+          <property name="styleSheet"><string>font-size: 18px; padding: 20px; background-color: #eceff1; border: 1px solid #cfd8dc; border-radius: 5px;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_logs">
+          <property name="text"><string>📋 로그 조회 (View Logs)</string></property>
+          <property name="styleSheet"><string>font-size: 18px; padding: 20px; background-color: #eceff1; border: 1px solid #cfd8dc; border-radius: 5px;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_export">
+          <property name="text"><string>📊 레포트 내보내기 (Export Report)</string></property>
+          <property name="styleSheet"><string>font-size: 18px; padding: 20px; background-color: #eceff1; border: 1px solid #cfd8dc; border-radius: 5px;</string></property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_d1"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property></spacer>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+
+    <item>
+     <widget class="QWidget" name="alert_panel">
+      <property name="minimumSize"><size><width>300</width><height>0</height></size></property>
+      <property name="maximumSize"><size><width>300</width><height>16777215</height></size></property>
+      <property name="styleSheet"><string>background-color: #fafafa; border-left: 1px solid #e0e0e0;</string></property>
+      <layout class="QVBoxLayout" name="verticalLayout_alert">
+       <property name="leftMargin"><number>0</number></property>
+       <property name="topMargin"><number>0</number></property>
+       <property name="rightMargin"><number>0</number></property>
+       <property name="bottomMargin"><number>0</number></property>
+       <item>
+        <widget class="QLabel" name="label_atitle">
+         <property name="text"><string>🚨 경고 알림 (Alerts)</string></property>
+         <property name="alignment"><set>Qt::AlignCenter</set></property>
+         <property name="styleSheet"><string>font-size: 18px; font-weight: bold; padding: 10px; background-color: #f5f5f5; border-bottom: 1px solid #e0e0e0; border-left: none;</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QScrollArea" name="alert_scroll">
+         <property name="widgetResizable"><bool>true</bool></property>
+         <property name="styleSheet"><string>border: none; background-color: transparent;</string></property>
+         <widget class="QWidget" name="alert_content">
+          <property name="geometry"><rect><x>0</x><y>0</y><width>300</width><height>700</height></rect></property>
+          <property name="styleSheet"><string>background-color: transparent;</string></property>
+          <layout class="QVBoxLayout" name="alert_layout">
+           <property name="alignment"><set>Qt::AlignTop</set></property>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_test_alert">
+         <property name="text"><string>임시 경고 추가</string></property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>
