@@ -92,6 +92,7 @@ def ensure_admin_registered(ui_dir: str, parent: QMainWindow | None = None) -> b
                 )
 
         dialog.button_ok.clicked.connect(try_register)
+        dialog.button_cancel.hide()
         dialog.button_cancel.clicked.connect(dialog.reject)
         dialog.lineEdit_confirm.returnPressed.connect(try_register)
 
@@ -126,9 +127,9 @@ def main():
     stacked.setCurrentIndex(0)  # 잠금 화면
 
     # admin 없으면 최초 설정 팝업 (첫 화면에서)
-    if not ensure_admin_registered(ui_dir, window):
-        # 사용자가 등록 다이얼로그를 취소했거나 DB 연결 실패
-        pass  # 그대로 메인 창은 띄움 (재시도 가능하도록)
+    while not ensure_admin_registered(ui_dir, window):
+        # 사용자가 등록 다이얼로그를 취소했거나 DB 연결 실패 -> 반복 시도
+        pass
 
     # 잠금 화면 위젯 (page_lock)
     lock = window.page_lock
@@ -165,6 +166,13 @@ def main():
         dialog.exec()
 
     lock.adminModeButton.clicked.connect(on_admin_mode_clicked)
+    
+    # 작업자/관리자 화면 -> 잠금 화면 돌아가기
+    def back_to_lock():
+        stacked.setCurrentIndex(0)
+
+    window.page_worker.backButton.clicked.connect(back_to_lock)
+    window.page_admin.backButton.clicked.connect(back_to_lock)
 
     window.show()
     sys.exit(app.exec())
