@@ -60,7 +60,7 @@ uv sync
 ### register-controller / access-controller / soy-controller (펌웨어)
 
 - **작업자 등록키트** (`register-controller/`): Arduino Uno + RFID, RegisterController 펌웨어. 중앙서버와 Serial 통신.
-- **VSCode**에 **PlatformIO IDE** 확장을 설치한 뒤, 각 폴더(`register-controller/`, `access-controller/`, `soy-controller/`)를 열어 빌드·업로드합니다.
+- **VSCode**에 **PlatformvIO IDE** 확장을 설치한 뒤, 각 폴더(`register-controller/`, `access-controller/`, `soy-controller/`)를 열어 빌드·업로드합니다.
 
 ### 서버·DB (SoyServer + MySQL)
 
@@ -75,11 +75,12 @@ docker compose up -d
 - **SoyServer TCP**: `localhost:9001` — Soy-PC(관리자 UI)가 Worker CRUD·card_read 푸시에 사용. **soy-pc 실행 전에 서버가 떠 있어야 함.**
 - **Adminer** (DB 스키마 조회): http://localhost:8080 — 자동 로그인(soydb), 로컬/내부용만 사용 권장
 - 로컬에서 마이그레이션만 수동 실행: `cd soy-server && uv run alembic upgrade head` (상세는 [soy-db/README.md](soy-db/README.md) 참고)
+- **아두이노 시리얼(RFID 등) 사용 시 (Linux)**: 아두이노 USB 연결 후, 프로젝트 루트 `.env` 에 `SERIAL_DEVICE=/dev/ttyUSB0` 또는 `/dev/ttyACM0` 설정하고 `docker compose up -d` 로 기동.
 
 ### soy-pc (관리자 UI)
 
 - **UI 수정**: `designer.py`로 Qt Designer를 띄워 `soy-pc/ui/` 폴더의 `.ui` 파일(메인: `main_window.ui`, 화면별: `lock_screen.ui`, `worker_screen.ui`, `admin_screen.ui`, `password_dialog.ui`)을 편집합니다. (Qt 설치 필요. macOS: `brew install qt`)
-- **실행**: `soy_pc.py`로 SoyAdmin 앱을 실행합니다. **Connection refused (61)** 가 나오면 SoyServer가 먼저 떠 있는지 확인하세요 (Docker: `docker compose up -d` 또는 로컬: `uv run uvicorn app.main:app --app-dir soy-server --host 127.0.0.1 --port 8000`). soy-pc는 TCP 포트 **9001**로 접속합니다.
+- **실행**: `soy_pc.py`로 SoyAdmin 앱을 실행합니다. soy-pc는 **TCP 9001**로 접속합니다 (HTTP 8000이 아님). 서버가 떠 있는데도 연결 실패 시: `docker compose logs soy-server` 에서 `[TCP] listening on port 9001` 출력 여부 확인, 터미널에서 `nc -zv 127.0.0.1 9001` 로 포트 개방 여부 확인. 다른 호스트에서 접속 시 `SOY_SERVER_HOST=서버IP` 설정.
 
 ```bash
 uv run python designer.py    # UI 편집

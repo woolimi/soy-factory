@@ -11,10 +11,15 @@ from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
 
-# 기본값
+# 기본값 (환경변수 SOY_SERVER_HOST, SOY_SERVER_TCP_PORT)
 _HOST = os.environ.get("SOY_SERVER_HOST", "127.0.0.1")
 _PORT = int(os.environ.get("SOY_SERVER_TCP_PORT", "9001"))
 _TIMEOUT = 10.0
+
+
+def get_server_address() -> str:
+    """soy-pc가 연결하는 서버 주소(host:port). 에러 메시지 등에 사용."""
+    return f"{_HOST}:{_PORT}"
 
 _socket: socket.socket | None = None
 _socket_lock = threading.Lock()
@@ -68,16 +73,20 @@ def _ensure_connected() -> socket.socket:
         except ConnectionRefusedError:
             s.close()
             raise ConnectionRefusedError(
-                f"서버에 연결할 수 없습니다 (connection refused).\n"
-                f"soy-server를 먼저 실행하세요: uv run uvicorn app.main:app --app-dir soy-server --host 127.0.0.1 --port 8000\n"
-                f"연결 주소: {_HOST}:{_PORT}"
+                f"서버 TCP 포트에 연결할 수 없습니다 (connection refused).\n\n"
+                f"연결 시도 주소: {_HOST}:{_PORT}\n"
+                f"(환경변수: SOY_SERVER_HOST, SOY_SERVER_TCP_PORT)\n\n"
+                f"※ HTTP(8000)가 아니라 TCP(9001) 포트입니다.\n"
+                f"  - Docker: docker compose 로 띄웠다면 9001 포트가 매핑되는지 확인.\n"
+                f"  - 서버 로그에 '[TCP] listening on port 9001' 이 출력되는지 확인하세요."
             ) from None
         except OSError as e:
             if getattr(e, "errno", None) == 61:  # ECONNREFUSED (macOS/Linux)
                 s.close()
                 raise ConnectionRefusedError(
-                    f"서버에 연결할 수 없습니다 (connection refused). "
-                    f"soy-server가 실행 중인지 확인하세요. ({_HOST}:{_PORT})"
+                    f"서버 TCP 포트에 연결할 수 없습니다 (connection refused).\n\n"
+                    f"연결 시도 주소: {_HOST}:{_PORT}\n"
+                    f"※ TCP 9001 포트가 열려 있어야 합니다. 서버 로그에서 '[TCP] listening on port 9001' 확인."
                 ) from e
             s.close()
             raise
@@ -91,57 +100,59 @@ def _ensure_connected() -> socket.socket:
 
 
 def _reader_loop() -> None:
-    """한 줄씩 읽어 response면 pending에 넣고, card_read면 콜백."""
+    """한 줄씩 읽어 response면 pending에 넣고, card_read면 콜백. buf는 유지해 잘린 메시지 손실 방지."""
     global _socket
+    buf = b""
     while _reader_running.is_set():
         try:
             s = _socket
             if s is None:
                 break
-            buf = b""
-            while True:
+            try:
+                chunk = s.recv(4096)
+            except (ConnectionResetError, BrokenPipeError, OSError):
+                chunk = b""
+            if not chunk:
+                break
+            buf += chunk
+            # 한 줄씩 처리 (나머지는 buf에 유지)
+            while b"\n" in buf:
+                line, buf = buf.split(b"\n", 1)
+                line_str = line.decode("utf-8", errors="ignore").strip()
+                if not line_str:
+                    continue
                 try:
-                    chunk = s.recv(4096)
-                except (ConnectionResetError, BrokenPipeError, OSError):
-                    chunk = b""
-                if not chunk:
-                    break
-                buf += chunk
-                while b"\n" in buf:
-                    line, buf = buf.split(b"\n", 1)
-                    line_str = line.decode("utf-8", errors="ignore").strip()
-                    if not line_str:
-                        continue
-                    try:
-                        msg = json.loads(line_str)
-                    except json.JSONDecodeError:
-                        continue
-                    if not isinstance(msg, dict):
-                        continue
-                    if msg.get("type") == "response":
-                        rid = msg.get("id")
-                        ok = msg.get("ok", False)
-                        body = msg.get("body")
-                        err = msg.get("error") or ""
-                        with _pending_lock:
-                            if rid in _pending:
-                                ev, res = _pending.pop(rid)
-                                res.append((ok, body, err))
-                                ev.set()
-                    elif msg.get("type") == "card_read":
-                        uid = msg.get("uid") or ""
-                        logger.info("[RFID] card_read received from server uid=%r callback=%s", uid, _card_read_callback is not None)
-                        if uid and _card_read_callback:
-                            try:
-                                _card_read_callback(uid)
-                                logger.info("[RFID] card_read callback done uid=%r", uid)
-                            except Exception as e:
-                                logger.warning("[RFID] card_read callback error: %s", e)
-                        elif not uid:
-                            logger.warning("[RFID] card_read ignored: uid empty")
-                        else:
-                            logger.warning("[RFID] card_read ignored: no callback registered")
-            break
+                    msg = json.loads(line_str)
+                except json.JSONDecodeError:
+                    continue
+                if not isinstance(msg, dict):
+                    continue
+                if msg.get("type") == "response":
+                    rid = msg.get("id")
+                    ok = msg.get("ok", False)
+                    body = msg.get("body")
+                    err = msg.get("error") or ""
+                    with _pending_lock:
+                        if rid in _pending:
+                            ev, res = _pending.pop(rid)
+                            res.append((ok, body, err))
+                            ev.set()
+                elif msg.get("type") == "card_read":
+                    uid = msg.get("uid") or ""
+                    logger.info("[RFID] card_read received from server uid=%r callback=%s", uid, _card_read_callback is not None)
+                    if uid and _card_read_callback:
+                        try:
+                            _card_read_callback(uid)
+                            logger.info("[RFID] card_read callback done uid=%r", uid)
+                        except Exception as e:
+                            logger.warning("[RFID] card_read callback error: %s", e)
+                    elif not uid:
+                        logger.warning("[RFID] card_read ignored: uid empty")
+                    else:
+                        logger.warning("[RFID] card_read ignored: no callback registered")
+            # 버퍼 비정상 증가 방지 (한 줄은 보통 수백 바이트 미만)
+            if len(buf) > 65536:
+                buf = b""
         except Exception:
             break
     with _socket_lock:
@@ -216,6 +227,23 @@ def set_card_read_callback(cb: Callable[[str], None] | None) -> None:
     """card_read 푸시 수신 시 호출할 콜백."""
     global _card_read_callback
     _card_read_callback = cb
+
+
+def admin_count() -> int:
+    """관리자 수. 서버 연결 실패 시 예외."""
+    ok, body, err = _request("admin_count", {})
+    if not ok:
+        raise RuntimeError(err or "admin_count failed")
+    if body is not None and isinstance(body, dict) and "count" in body:
+        return int(body["count"])
+    return 0
+
+
+def register_first_admin(password: str) -> None:
+    """최초 관리자 등록(비밀번호). 이미 있거나 실패 시 예외."""
+    ok, _, err = _request("register_first_admin", {"password": password.strip()})
+    if not ok:
+        raise RuntimeError(err or "등록 실패")
 
 
 def get_first_admin_id() -> int | None:

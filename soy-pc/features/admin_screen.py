@@ -34,7 +34,7 @@ def _open_worker_info_dialog(
     worker_id: int,
     name: str,
     card_uid: str,
-    note: str,
+    created_at_str: str,
     refresh_table_callback,
 ) -> None:
     """작업자 정보 팝업. 수정/삭제 시 API 호출 후 테이블 갱신."""
@@ -43,44 +43,30 @@ def _open_worker_info_dialog(
     dialog._worker_id = worker_id
     dialog._refresh = refresh_table_callback
 
-    def set_labels(n: str, u: str, no: str):
+    def set_labels(n: str, u: str, date_str: str):
         dialog.label_name_value.setText(n or "—")
         dialog.label_uid_value.setText(u or "—")
-        dialog.label_note_value.setText(no or "—")
+        dialog.label_note_value.setText(date_str or "—")
 
-    set_labels(name, card_uid, note)
+    set_labels(name, card_uid, created_at_str)
 
     def do_edit():
         edit_d = QDialog(parent)
         uic.loadUi(os.path.join(ui_dir, "worker_edit_dialog.ui"), edit_d)
         edit_d.nameEdit.setText(name)
-        edit_d.cardUidEdit.setText(card_uid)
         edit_d.setWindowTitle("작업자 수정")
 
         def on_edit_ok():
             QGuiApplication.inputMethod().commit()
             new_name = edit_d.nameEdit.text().strip()
-            new_uid = edit_d.cardUidEdit.text().strip()
             if not new_name:
                 box = MessageBox("입력 오류", "이름을 입력하세요.", edit_d)
                 box.cancelButton.hide()
                 box.yesButton.setText("확인")
                 box.exec()
                 return
-            if not new_uid:
-                box = MessageBox("입력 오류", "카드 UID를 입력하세요.", edit_d)
-                box.cancelButton.hide()
-                box.yesButton.setText("확인")
-                box.exec()
-                return
             try:
-                api_update_worker(worker_id, name=new_name, card_uid=new_uid)
-            except WorkerCreateConflict as e:
-                box = MessageBox("수정 실패", e.detail, edit_d)
-                box.cancelButton.hide()
-                box.yesButton.setText("확인")
-                box.exec()
-                return
+                api_update_worker(worker_id, name=new_name)
             except WorkerNotFound:
                 box = MessageBox("수정 실패", "작업자를 찾을 수 없습니다.", edit_d)
                 box.cancelButton.hide()
@@ -95,7 +81,7 @@ def _open_worker_info_dialog(
                 box.exec()
                 return
             refresh_table_callback()
-            set_labels(new_name, new_uid, note)
+            set_labels(new_name, card_uid, created_at_str)
             edit_d.accept()
 
         edit_d.button_ok.clicked.connect(on_edit_ok)
@@ -137,7 +123,13 @@ def _open_worker_info_dialog(
 def setup_admin_screen(window, stacked, ui_dir: str) -> None:
     """관리자 화면: 사이드바, 작업자 관리(목록·추가·정보 팝업에서 수정/삭제)."""
     admin = window.page_admin
-    admin.workerTable.setHorizontalHeaderLabels(["이름", "카드 UID", "비고"])
+    admin.workerTable.setHorizontalHeaderLabels(["이름", "카드 UID", "등록일자"])
+
+    def _format_created_at(created_at: str) -> str:
+        """API created_at (ISO) → 날짜만 표시 (YYYY-MM-DD)."""
+        if not created_at:
+            return ""
+        return created_at[:10] if len(created_at) >= 10 else created_at
 
     def refresh_workers():
         try:
@@ -152,7 +144,7 @@ def setup_admin_screen(window, stacked, ui_dir: str) -> None:
             item0.setData(Qt.ItemDataRole.UserRole, w.get("worker_id"))
             admin.workerTable.setItem(row, 0, item0)
             admin.workerTable.setItem(row, 1, QTableWidgetItem(w.get("card_uid", "")))
-            admin.workerTable.setItem(row, 2, QTableWidgetItem(""))
+            admin.workerTable.setItem(row, 2, QTableWidgetItem(_format_created_at(w.get("created_at", ""))))
 
     def on_worker_cell_clicked(row: int, _column: int):
         if row < 0:
@@ -163,13 +155,13 @@ def setup_admin_screen(window, stacked, ui_dir: str) -> None:
             return
         name = item0.text() if item0 else ""
         uid = ""
-        note = ""
+        created_at_str = ""
         if admin.workerTable.item(row, 1):
             uid = admin.workerTable.item(row, 1).text()
         if admin.workerTable.item(row, 2):
-            note = admin.workerTable.item(row, 2).text()
+            created_at_str = admin.workerTable.item(row, 2).text()
         _open_worker_info_dialog(
-            window, ui_dir, worker_id, name, uid, note, refresh_workers
+            window, ui_dir, worker_id, name, uid, created_at_str, refresh_workers
         )
 
     admin.workerTable.cellClicked.connect(on_worker_cell_clicked)

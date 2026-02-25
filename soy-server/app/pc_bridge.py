@@ -14,7 +14,7 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 from app import workers
-from app.auth import verify_admin_password
+from app.auth import create_first_admin, verify_admin_password
 
 # 환경변수
 TCP_PORT = int(os.environ.get("SOY_PC_TCP_PORT", "9001"))
@@ -25,6 +25,7 @@ _clients: set[socket.socket] = set()
 _clients_lock = threading.Lock()
 _serial_thread: threading.Thread | None = None
 _tcp_thread: threading.Thread | None = None
+_tcp_server_socket: socket.socket | None = None
 _stop = threading.Event()
 
 # admin 세션: token -> admin_id (Worker CRUD는 유효한 토큰 필요)
@@ -94,6 +95,20 @@ def _handle_request(action: str, body: dict[str, Any]) -> tuple[bool, Any, str]:
                 with _sessions_lock:
                     _sessions.pop(token, None)
             return (True, None, "")
+        if action == "admin_count":
+            n = workers.count_admins()
+            return (True, {"count": n}, "")
+        if action == "register_first_admin":
+            password = (body.get("password") or "").strip()
+            if not password:
+                return (False, None, "비밀번호를 입력하세요.")
+            if len(password) < 4:
+                return (False, None, "비밀번호는 4자 이상으로 설정하세요.")
+            try:
+                create_first_admin(password)
+                return (True, None, "")
+            except ValueError as e:
+                return (False, None, str(e))
         # Worker CRUD는 admin 로그인 필수
         ok, err = _require_admin(body)
         if not ok:
@@ -238,29 +253,15 @@ def _serial_loop() -> None:
         logger.info("[Serial] closed %s", SERIAL_PORT)
 
 
-def _tcp_loop() -> None:
-    """TCP 서버: 접속 수락 후 클라이언트별 스레드."""
-    try:
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server.bind(("", TCP_PORT))
-        server.listen(8)
-        server.settimeout(1.0)
-        msg = f"[TCP] listening on port {TCP_PORT} (Soy-PC)"
-        logger.info(msg)
-        print(msg, flush=True)
-    except Exception as e:
-        msg = f"[TCP] failed to bind port {TCP_PORT}: {e}"
-        logger.error(msg)
-        print(msg, flush=True)
-        return
+def _tcp_accept_loop(server: socket.socket) -> None:
+    """TCP accept 루프 (서버 소켓은 메인 스레드에서 이미 bind/listen 완료)."""
     try:
         while not _stop.is_set():
             try:
                 client, addr = server.accept()
             except socket.timeout:
                 continue
-            except Exception:
+            except OSError:
                 break
             with _clients_lock:
                 _clients.add(client)
@@ -271,17 +272,30 @@ def _tcp_loop() -> None:
             t = threading.Thread(target=_handle_client, args=(client,), daemon=True)
             t.start()
     finally:
-        try:
-            server.close()
-        except Exception:
-            pass
+        pass
 
 
 def start() -> None:
-    """브릿지 스레드 시작."""
-    global _serial_thread, _tcp_thread
+    """브릿지 시작. TCP 포트는 메인 스레드에서 즉시 bind하여 기동 직후부터 접속 가능하게 함."""
+    global _serial_thread, _tcp_thread, _tcp_server_socket
     _stop.clear()
-    _tcp_thread = threading.Thread(target=_tcp_loop, daemon=True)
+    # TCP 서버 소켓을 메인 스레드에서 bind/listen (기동 완료 전에 9001 포트 확실히 개방)
+    try:
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server.bind(("0.0.0.0", TCP_PORT))
+        server.listen(8)
+        server.settimeout(1.0)
+        _tcp_server_socket = server
+        msg = f"[TCP] listening on port {TCP_PORT} (Soy-PC)"
+        logger.info(msg)
+        print(msg, flush=True)
+    except Exception as e:
+        msg = f"[TCP] failed to bind port {TCP_PORT}: {e}"
+        logger.error(msg)
+        print(msg, flush=True)
+        return
+    _tcp_thread = threading.Thread(target=_tcp_accept_loop, args=(server,), daemon=True)
     _tcp_thread.start()
     if SERIAL_PORT:
         _serial_thread = threading.Thread(target=_serial_loop, daemon=True)
@@ -295,7 +309,14 @@ def start() -> None:
 
 def stop() -> None:
     """브릿지 정지."""
+    global _tcp_server_socket
     _stop.set()
+    if _tcp_server_socket is not None:
+        try:
+            _tcp_server_socket.close()
+        except Exception:
+            pass
+        _tcp_server_socket = None
     with _clients_lock:
         for sock in list(_clients):
             try:

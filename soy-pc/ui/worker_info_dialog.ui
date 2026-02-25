@@ -71,7 +71,7 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_note_caption">
        <property name="text">
-        <string>비고</string>
+        <string>등록일자</string>
        </property>
       </widget>
      </item>

@@ -23,6 +23,7 @@ def _get_connection_params() -> dict:
             "password": unquote(parsed.password) if parsed.password else "soy",
             "database": db_path or "soydb",
             "charset": "utf8mb4",
+            "connect_timeout": 5,
         }
     return {
         "host": os.environ.get("MYSQL_HOST", "127.0.0.1"),
@@ -31,6 +32,7 @@ def _get_connection_params() -> dict:
         "password": os.environ.get("MYSQL_PASSWORD", "soy"),
         "database": os.environ.get("MYSQL_DATABASE", "soydb"),
         "charset": "utf8mb4",
+        "connect_timeout": 5,
     }
 
 

@@ -1,4 +1,4 @@
-# SoyServer (FastAPI) — 프로젝트 루트에서 빌드
+# SoyServer (FastAPI). 빌드 컨텍스트는 프로젝트 루트 (docker-compose에서 context: . 지정)
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -8,7 +8,8 @@ COPY pyproject.toml uv.lock ./
 COPY soy-server/ ./soy-server/
 
 # 서버 + 마이그레이션용 의존성 (pyproject.toml과 동기화)
-RUN pip install --no-cache-dir fastapi "uvicorn[standard]" alembic sqlalchemy pymysql bcrypt
+RUN pip install --no-cache-dir fastapi "uvicorn[standard]" alembic sqlalchemy pymysql bcrypt pyserial \
+    && python -c "import serial; print('pyserial OK')"
 
 RUN chmod +x /app/soy-server/entrypoint.sh
 

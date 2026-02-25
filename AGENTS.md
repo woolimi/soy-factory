@@ -25,7 +25,7 @@ AI 에이전트가 이 저장소에서 작업할 때 참고할 프로젝트 컨�
 **루트 주요 파일**
 
 - `pyproject.toml`, `uv.lock` — Python 의존성 (서버·PyQt6 등). 패키지 추가 시 `uv add [패키지]`.
-- `docker-compose.yml` — MySQL + SoyServer 한 번에 기동. `docker compose up -d`.
+- `docker-compose.yml` — MySQL + SoyServer 한 번에 기동. `docker compose up -d`. 각 서비스 이미지는 `soy-db/Dockerfile`, `soy-server/Dockerfile` 에서 빌드.
 - `designer.py` — Qt Designer 실행, `soy-pc/ui/main_window.ui` 열기 (다른 화면은 `soy-pc/ui/` 내 `*_screen.ui`, `password_dialog.ui`).
 - `soy_pc.py` — SoyAdmin 앱 실행 (`soy-pc/main.py` 호출).
 

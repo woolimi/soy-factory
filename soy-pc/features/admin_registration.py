@@ -1,4 +1,4 @@
-"""최초 관리자 등록 — admin 테이블이 비어 있으면 비밀번호 등록 팝업."""
+"""최초 관리자 등록 — 서버에 admin이 없으면 비밀번호 등록 팝업 (서버 API 사용)."""
 import os
 
 from PyQt6 import uic
@@ -7,21 +7,36 @@ from PyQt6.QtWidgets import QDialog, QWidget
 
 from qfluentwidgets import MessageBox
 
-from db import count_admins, create_admin, hash_password
+from api.client import admin_count, get_server_address, register_first_admin
 
 
 def ensure_admin_registered(ui_dir: str, parent: QWidget | None = None) -> bool:
     """
-    admin 테이블이 비어 있으면 최초 설정(비밀번호 등록) 팝업을 띄움.
-    등록 성공 또는 이미 admin이 있으면 True, DB 오류 등으로 실패 시 False.
+    서버를 통해 관리자 수 확인. 0명이면 최초 설정(비밀번호 등록) 팝업을 띄움.
+    등록 성공 또는 이미 admin이 있으면 True, 서버 연결 실패 시 False.
     """
-    n = count_admins()
-    if n < 0:
+    try:
+        n = admin_count()
+    except (ConnectionRefusedError, TimeoutError, OSError) as e:
+        addr = get_server_address()
         w = MessageBox(
-            "DB 연결 실패",
-            "데이터베이스에 연결할 수 없습니다.\n"
-            "MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE\n"
-            "또는 SOY_DATABASE_URL 환경변수를 확인하세요.",
+            "서버 연결 실패",
+            "soy-server TCP에 연결할 수 없습니다.\n\n"
+            f"연결 주소: {addr}\n"
+            f"(HTTP 8000이 아닌 TCP 9001 포트입니다.)\n\n"
+            "서버가 떠 있어도 TCP 9001이 열려 있어야 합니다.\n"
+            "서버 로그에 '[TCP] listening on port 9001' 이 있는지 확인하세요.\n\n"
+            f"상세: {e!s}",
+            parent,
+        )
+        w.cancelButton.hide()
+        w.yesButton.setText("확인")
+        w.exec()
+        return False
+    except Exception as e:
+        w = MessageBox(
+            "오류",
+            f"관리자 수 확인 중 오류가 발생했습니다.\n{e!s}",
             parent,
         )
         w.cancelButton.hide()
@@ -67,14 +82,14 @@ def ensure_admin_registered(ui_dir: str, parent: QWidget | None = None) -> bool:
                 dialog.lineEdit_confirm.setFocus()
                 return
             try:
-                create_admin(hash_password(pw))
+                register_first_admin(pw)
                 box = MessageBox("등록 완료", "관리자 비밀번호가 등록되었습니다.", dialog)
                 box.cancelButton.hide()
                 box.yesButton.setText("확인")
                 box.exec()
                 dialog.accept()
             except Exception as e:
-                box = MessageBox("등록 실패", f"DB 등록 중 오류가 발생했습니다.\n{e!s}", dialog)
+                box = MessageBox("등록 실패", f"서버 등록 중 오류가 발생했습니다.\n{e!s}", dialog)
                 box.cancelButton.hide()
                 box.yesButton.setText("확인")
                 box.exec()

@@ -45,26 +45,36 @@
 
 ### PC → 서버 (요청)
 
+**관리자 수 확인 / 최초 관리자 등록 (인증 불필요)**
+
+```json
+{"type":"request","id":0,"action":"admin_count","body":{}}
+{"type":"request","id":1,"action":"register_first_admin","body":{"password":"비밀번호"}}
+```
+
+- `admin_count`: 응답 `body.count` = 관리자 수. soy-pc는 DB 직접 연결 없이 서버로만 조회.
+- `register_first_admin`: admin이 0명일 때만 사용. 첫 관리자 비밀번호 등록.
+
 **관리자 로그인 (Worker CRUD 전에 필수)**
 
 ```json
-{"type":"request","id":0,"action":"admin_login","body":{"password":"비밀번호"}}
+{"type":"request","id":2,"action":"admin_login","body":{"password":"비밀번호"}}
 ```
 
 **Worker CRUD (body에 auth_token 필수)**
 
 ```json
-{"type":"request","id":1,"action":"list_workers","body":{"auth_token":"<로그인 시 받은 토큰>"}}
-{"type":"request","id":2,"action":"get_first_admin_id","body":{"auth_token":"..."}}
-{"type":"request","id":3,"action":"create_worker","body":{"admin_id":1,"name":"홍길동","card_uid":"A1B2C3D4"}}
-{"type":"request","id":4,"action":"update_worker","body":{"worker_id":1,"name":"김철수"}}
-{"type":"request","id":5,"action":"delete_worker","body":{"auth_token":"...","worker_id":1}}
+{"type":"request","id":3,"action":"list_workers","body":{"auth_token":"<로그인 시 받은 토큰>"}}
+{"type":"request","id":4,"action":"get_first_admin_id","body":{"auth_token":"..."}}
+{"type":"request","id":5,"action":"create_worker","body":{"admin_id":1,"name":"홍길동","card_uid":"A1B2C3D4"}}
+{"type":"request","id":6,"action":"update_worker","body":{"worker_id":1,"name":"김철수"}}
+{"type":"request","id":7,"action":"delete_worker","body":{"auth_token":"...","worker_id":1}}
 ```
 
 **로그아웃**
 
 ```json
-{"type":"request","id":6,"action":"admin_logout","body":{"auth_token":"..."}}
+{"type":"request","id":8,"action":"admin_logout","body":{"auth_token":"..."}}
 ```
 
 ### 서버 → PC (응답)

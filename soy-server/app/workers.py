@@ -28,6 +28,13 @@ def _row_to_worker(row) -> dict:
     }
 
 
+def count_admins(engine: Engine | None = None) -> int:
+    """admin 테이블 레코드 수. 연결 실패 시 예외."""
+    eng = engine or get_engine()
+    with eng.connect() as conn:
+        return int(conn.execute(text("SELECT COUNT(*) FROM admin")).scalar() or 0)
+
+
 def get_first_admin_id(engine: Engine | None = None) -> int | None:
     eng = engine or get_engine()
     with eng.connect() as conn:

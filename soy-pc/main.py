@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import traceback
 
 from PyQt6 import uic
 from PyQt6.QtCore import Qt
@@ -74,16 +75,22 @@ def main() -> None:
 
     stacked.setCurrentIndex(0)
 
-    while not ensure_admin_registered(ui_dir, window):
-        pass
-
     setup_lock_screen(window, stacked, ui_dir)
     setup_worker_screen(window, stacked)
     setup_admin_screen(window, stacked, ui_dir)
 
     window.show()
+
+    while not ensure_admin_registered(ui_dir, window):
+        pass
+
     sys.exit(app.exec())
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        traceback.print_exc()
+        print("SoyAdmin 시작 실패:", e, file=sys.stderr, flush=True)
+        sys.exit(1)

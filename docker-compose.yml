@@ -1,9 +1,12 @@
 # SoyFactory — MySQL(SoyDB) + SoyServer 한 번에 실행
 # 사용: 프로젝트 루트에서 docker compose up -d
+# 아두이노 시리얼(RFID): .env 에 SERIAL_DEVICE=/dev/ttyUSB0 또는 /dev/ttyACM0 설정 시 해당 장치 사용, 미설정 시 시리얼 비활성
 
 services:
   mysql:
-    image: mysql:8
+    build:
+      context: ./soy-db
+      dockerfile: Dockerfile
     environment:
       MYSQL_ROOT_PASSWORD: soyroot
       MYSQL_DATABASE: soydb
@@ -19,7 +22,9 @@ services:
       retries: 10
 
   soy-server:
-    build: .
+    build:
+      context: .
+      dockerfile: soy-server/Dockerfile
     ports:
       - "8000:8000"   # HTTP (health, root, docs)
       - "9001:9001"   # TCP (Soy-PC: Worker CRUD, card_read 푸시)
@@ -29,9 +34,10 @@ services:
       MYSQL_USER: soy
       MYSQL_PASSWORD: soy
       MYSQL_DATABASE: soydb
-      SOY_REGISTER_SERIAL_PORT: /dev/ttyUSB0
+      # SERIAL_DEVICE 설정 시 /dev/ttyUSB0(컨테이너 내), 미설정 시 빈 값으로 시리얼 비활성
+      SOY_REGISTER_SERIAL_PORT: ${SERIAL_DEVICE:+/dev/ttyUSB0}
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
+      - ${SERIAL_DEVICE:-/dev/null}:/dev/ttyUSB0
     depends_on:
       mysql:
         condition: service_healthy
