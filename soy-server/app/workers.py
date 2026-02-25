@@ -49,7 +49,7 @@ def list_workers(engine: Engine | None = None) -> list[dict]:
     with eng.connect() as conn:
         rows = conn.execute(
             text(
-                "SELECT worker_id, admin_id, name, card_uid, created_at FROM worker ORDER BY worker_id"
+                "SELECT worker_id, admin_id, name, card_uid, created_at FROM workers ORDER BY worker_id"
             )
         ).fetchall()
         return [_row_to_worker(r) for r in rows]
@@ -68,7 +68,7 @@ def create_worker(
         try:
             conn.execute(
                 text(
-                    "INSERT INTO worker (admin_id, name, card_uid) VALUES (:aid, :name, :uid)"
+                    "INSERT INTO workers (admin_id, name, card_uid) VALUES (:aid, :name, :uid)"
                 ),
                 {"aid": admin_id, "name": name, "uid": card_uid},
             )
@@ -79,7 +79,7 @@ def create_worker(
             raise
         row = conn.execute(
             text(
-                "SELECT worker_id, admin_id, name, card_uid, created_at FROM worker WHERE card_uid = :uid ORDER BY worker_id DESC LIMIT 1"
+                "SELECT worker_id, admin_id, name, card_uid, created_at FROM workers WHERE card_uid = :uid ORDER BY worker_id DESC LIMIT 1"
             ),
             {"uid": card_uid},
         ).fetchone()
@@ -108,7 +108,7 @@ def update_worker(
         with eng.connect() as conn:
             row = conn.execute(
                 text(
-                    "SELECT worker_id, admin_id, name, card_uid, created_at FROM worker WHERE worker_id = :wid"
+                    "SELECT worker_id, admin_id, name, card_uid, created_at FROM workers WHERE worker_id = :wid"
                 ),
                 {"wid": worker_id},
             ).fetchone()
@@ -118,7 +118,7 @@ def update_worker(
     with eng.begin() as conn:
         try:
             conn.execute(
-                text(f"UPDATE worker SET {', '.join(updates)} WHERE worker_id = :wid"),
+                text(f"UPDATE workers SET {', '.join(updates)} WHERE worker_id = :wid"),
                 params,
             )
         except IntegrityError as e:
@@ -130,7 +130,7 @@ def update_worker(
             raise
         row = conn.execute(
             text(
-                "SELECT worker_id, admin_id, name, card_uid, created_at FROM worker WHERE worker_id = :wid"
+                "SELECT worker_id, admin_id, name, card_uid, created_at FROM workers WHERE worker_id = :wid"
             ),
             {"wid": worker_id},
         ).fetchone()
@@ -143,7 +143,7 @@ def delete_worker(worker_id: int, engine: Engine | None = None) -> None:
     eng = engine or get_engine()
     with eng.begin() as conn:
         r = conn.execute(
-            text("DELETE FROM worker WHERE worker_id = :wid"),
+            text("DELETE FROM workers WHERE worker_id = :wid"),
             {"wid": worker_id},
         )
         if r.rowcount == 0:
