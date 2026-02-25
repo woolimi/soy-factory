@@ -8,11 +8,11 @@ COPY pyproject.toml uv.lock ./
 COPY soy-server/ ./soy-server/
 
 # 서버 + 마이그레이션용 의존성 (pyproject.toml과 동기화)
-RUN pip install --no-cache-dir fastapi "uvicorn[standard]" alembic sqlalchemy pymysql
+RUN pip install --no-cache-dir fastapi "uvicorn[standard]" alembic sqlalchemy pymysql bcrypt
 
 RUN chmod +x /app/soy-server/entrypoint.sh
 
-EXPOSE 8000
+EXPOSE 8000 9001
 
 # 기동 시 마이그레이션 적용 후 uvicorn 실행
 CMD ["/app/soy-server/entrypoint.sh"]

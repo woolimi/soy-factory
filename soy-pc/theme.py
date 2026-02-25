@@ -1,121 +1,313 @@
 """
-SoyAdmin 고정 테마 (다크/라이트 감지 없이 항상 동일한 UI).
-앱 전체에 적용하여 시스템 테마와 무관하게 일관된 look & feel 유지.
+SoyAdmin 공장 테마 — 밝은 테마 고정, 공장/간장 공장 컨셉.
+Fluent Light 위에 콘텐츠 영역에만 적용하는 스타일.
 """
 
-# 색상 팔레트 (단일 고정 테마)
-BG_MAIN = "#1a1a2e"
-BG_SECONDARY = "#16213e"
-BG_TERTIARY = "#0f0f1a"
-BORDER = "#0f3460"
-TEXT_PRIMARY = "#eaeaea"
-TEXT_SECONDARY = "#a0a0a0"
-ACCENT = "#0f3460"
+# 밝은 공장 팔레트 (라이트 고정)
+BG_MAIN = "#f5f4f1"
+BG_CARD = "#ffffff"
+BG_BUTTON = "#f0eeea"
+BG_BUTTON_DISABLED = "#ebeaeb"
+BORDER = "#e5e2dc"
+BORDER_STRONG = "#d4d0c8"
+TEXT_PRIMARY = "#1c1c1c"
+TEXT_SECONDARY = "#5c5c5c"
+TEXT_MUTED = "#8a8a8a"
+TEXT_DISABLED = "#a0a0a0"
 
-# 잠금 화면 전용 — 간장 공장 느낌 (진한 갈색·앰버)
-LOCK_BG = "#1a1510"
-LOCK_BG_CARD = "#252018"
-LOCK_AMBER = "#c9a227"
-LOCK_AMBER_SOFT = "#a68b3c"
-LOCK_CREAM = "#f0ebe0"
-LOCK_CREAM_MUTED = "#b8ad9a"
-LOCK_BORDER = "#3d3428"
+# 악센트 — 간장 공장 (앰버/갈색)
+ACCENT = "#C4902B"
+ACCENT_HOVER = "#a67b22"
+ACCENT_SOFT = "#e8dcc4"
 
-GLOBAL_STYLESHEET = f"""
+# 잠금 화면 — 브랜드 강조
+LOCK_TITLE = "#8B6914"
+LOCK_SUBTITLE = "#5c5c5c"
+LOCK_BTN_BG = "#ffffff"
+LOCK_BTN_BORDER = "#d4d0c8"
+LOCK_BTN_HOVER_BG = "#e8dcc4"
+LOCK_BTN_HOVER_BORDER = "#C4902B"
+LOCK_HINT = "#8a8a8a"
+ADMIN_BTN_BG = "#f0eeea"
+ADMIN_BTN_HOVER = "#e0dcd4"
+
+FACTORY_STYLESHEET = f"""
+/* 공통 — 밝은 공장 배경 */
 QWidget {{
   background-color: {BG_MAIN};
   color: {TEXT_PRIMARY};
 }}
-QMainWindow {{
-  background-color: {BG_MAIN};
-}}
 QDialog {{
-  background-color: {BG_MAIN};
+  background-color: {BG_CARD};
+  color: {TEXT_PRIMARY};
+  border-radius: 12px;
+  padding: 24px;
+}}
+QDialog QWidget {{
+  background-color: transparent;
+}}
+QDialog QLabel {{
+  background-color: transparent;
 }}
 QPushButton {{
-  background-color: {BG_SECONDARY};
-  color: {TEXT_SECONDARY};
+  background-color: {BG_BUTTON};
+  color: {TEXT_PRIMARY};
   border: 1px solid {BORDER};
-  padding: 8px 12px;
-  min-height: 20px;
+  padding: 10px 16px;
+  min-height: 22px;
+  border-radius: 6px;
+  font-weight: 500;
 }}
 QPushButton:hover {{
   background-color: {BORDER};
-  color: {TEXT_PRIMARY};
+  border-color: {BORDER_STRONG};
 }}
 QPushButton:pressed {{
-  background-color: {BORDER};
+  background-color: {BORDER_STRONG};
 }}
-QPushButton#touchToEnterButton {{
-  background-color: transparent;
-  border: none;
-  color: {TEXT_PRIMARY};
-  font-size: 24px;
-}}
-QPushButton#touchToEnterButton:hover {{
-  background-color: transparent;
-  color: {TEXT_PRIMARY};
+QPushButton:disabled {{
+  background-color: {BG_BUTTON_DISABLED};
+  color: {TEXT_DISABLED};
+  border-color: {BORDER};
 }}
 QLabel {{
   color: {TEXT_PRIMARY};
 }}
 QLineEdit {{
-  background-color: {BG_SECONDARY};
+  background-color: {BG_CARD};
   color: {TEXT_PRIMARY};
   border: 1px solid {BORDER};
-  padding: 8px;
-  selection-background-color: {BORDER};
+  padding: 10px 12px;
+  border-radius: 6px;
+  selection-background-color: {ACCENT_SOFT};
 }}
-QMenuBar {{
-  background-color: {BG_MAIN};
-  color: {TEXT_PRIMARY};
+QLineEdit:focus {{
+  border-color: {ACCENT};
 }}
-QStatusBar {{
-  background-color: {BG_MAIN};
-  color: {TEXT_SECONDARY};
-}}
-QMessageBox {{
-  background-color: {BG_MAIN};
+QLineEdit:disabled {{
+  background-color: {BG_BUTTON_DISABLED};
+  color: {TEXT_DISABLED};
+  border-color: {BORDER};
 }}
 
-/* 잠금 화면 — 간장 공장 테마 */
+/* ========== 팝업(다이얼로그) 공통 ========== */
+QDialog QLabel#label_title {{
+  font-size: 16px;
+  font-weight: bold;
+  color: {TEXT_PRIMARY};
+  padding: 4px 0;
+}}
+QDialog QLabel#label_prompt {{
+  font-size: 13px;
+  color: {TEXT_PRIMARY};
+  padding: 2px 0;
+}}
+QDialog QLabel#statusLabel {{
+  font-size: 12px;
+  color: {TEXT_SECONDARY};
+  padding: 6px 0;
+  min-height: 1.2em;
+}}
+QDialog QLabel#label_name,
+QDialog QLabel#label_password,
+QDialog QLabel#label_confirm {{
+  color: {TEXT_SECONDARY};
+  min-width: 100px;
+}}
+QDialog QLineEdit {{
+  min-height: 20px;
+}}
+QDialog QPushButton#button_ok {{
+  background-color: {ACCENT};
+  color: white;
+  border: none;
+  min-width: 88px;
+  min-height: 36px;
+}}
+QDialog QPushButton#button_ok:hover {{
+  background-color: {ACCENT_HOVER};
+}}
+QDialog QPushButton#button_ok:disabled {{
+  background-color: {BG_BUTTON_DISABLED};
+  color: {TEXT_DISABLED};
+  border: 1px solid {BORDER};
+}}
+QDialog QPushButton#button_cancel {{
+  background-color: {BG_BUTTON};
+  color: {TEXT_SECONDARY};
+  min-width: 80px;
+  min-height: 36px;
+}}
+QDialog QPushButton#button_edit {{
+  background-color: {ACCENT};
+  color: white;
+  border: none;
+  min-width: 72px;
+  min-height: 36px;
+  border-radius: 6px;
+}}
+QDialog QPushButton#button_edit:hover {{
+  background-color: {ACCENT_HOVER};
+}}
+QDialog QPushButton#button_delete {{
+  background-color: {BG_BUTTON};
+  color: {TEXT_PRIMARY};
+  border: 1px solid {BORDER};
+  min-width: 72px;
+  min-height: 36px;
+  border-radius: 6px;
+}}
+QDialog QPushButton#button_delete:hover {{
+  background-color: {BORDER};
+}}
+QDialog QPushButton#button_close {{
+  background-color: {BG_BUTTON};
+  color: {TEXT_SECONDARY};
+  min-width: 72px;
+  min-height: 36px;
+  border-radius: 6px;
+}}
+QDialog QPushButton#button_close:hover {{
+  background-color: {BORDER};
+}}
+
+/* ========== 잠금 화면 (스마트 간장 공장) ========== */
 QWidget#LockScreen {{
-  background-color: {LOCK_BG};
+  background-color: {BG_MAIN};
 }}
 QWidget#LockScreen QLabel#label_lockTitle {{
-  color: {LOCK_AMBER};
+  color: {LOCK_TITLE};
   font-size: 28px;
   font-weight: bold;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }}
 QWidget#LockScreen QLabel#label_lockSubtitle {{
-  color: {LOCK_CREAM_MUTED};
+  color: {LOCK_SUBTITLE};
   font-size: 13px;
 }}
 QWidget#LockScreen QPushButton#touchToEnterButton {{
-  background-color: {LOCK_BG_CARD};
-  color: {LOCK_CREAM};
-  border: 2px solid {LOCK_BORDER};
+  background-color: {LOCK_BTN_BG};
+  color: {TEXT_PRIMARY};
+  border: 2px solid {LOCK_BTN_BORDER};
   border-radius: 12px;
   font-size: 22px;
+  font-weight: bold;
   padding: 24px;
 }}
 QWidget#LockScreen QPushButton#touchToEnterButton:hover {{
-  background-color: {LOCK_BORDER};
-  color: {LOCK_AMBER_SOFT};
-  border-color: {LOCK_AMBER_SOFT};
+  background-color: {LOCK_BTN_HOVER_BG};
+  border-color: {LOCK_BTN_HOVER_BORDER};
+  color: {ACCENT_HOVER};
 }}
 QWidget#LockScreen QLabel#label_touchHint {{
-  color: {LOCK_CREAM_MUTED};
+  color: {LOCK_HINT};
   font-size: 12px;
 }}
 QWidget#LockScreen QPushButton#adminModeButton {{
-  background-color: {LOCK_BG_CARD};
-  color: {LOCK_CREAM_MUTED};
-  border: 1px solid {LOCK_BORDER};
+  background-color: {ADMIN_BTN_BG};
+  color: {TEXT_SECONDARY};
+  border: 1px solid {BORDER};
 }}
 QWidget#LockScreen QPushButton#adminModeButton:hover {{
-  background-color: {LOCK_BORDER};
-  color: {LOCK_AMBER};
+  background-color: {ADMIN_BTN_HOVER};
+  color: {ACCENT};
+  border-color: {ACCENT_SOFT};
+}}
+
+/* ========== 작업자 화면 ========== */
+QWidget#WorkerScreen {{
+  background-color: {BG_MAIN};
+}}
+QWidget#WorkerScreen QLabel#label_workerTitle {{
+  color: {TEXT_PRIMARY};
+  font-size: 18px;
+  font-weight: bold;
+}}
+QWidget#WorkerScreen QPushButton#backButton {{
+  background-color: {BG_BUTTON};
+  color: {TEXT_PRIMARY};
+}}
+
+/* ========== 관리자 화면 (사이드바 + 콘텐츠) ========== */
+QWidget#AdminScreen {{
+  background-color: {BG_MAIN};
+}}
+/* 사이드바 */
+QWidget#AdminScreen QFrame#admin_sidebar {{
+  background-color: {BG_CARD};
+  border-right: 1px solid {BORDER};
+}}
+QWidget#AdminScreen QFrame#admin_sidebar QLabel#label_menuTitle {{
+  color: {TEXT_SECONDARY};
+  font-size: 11px;
+  font-weight: bold;
+}}
+QWidget#AdminScreen QFrame#admin_sidebar QPushButton#menu_worker_management {{
+  background-color: transparent;
+  color: {TEXT_PRIMARY};
+  border: none;
+  border-radius: 6px;
+  text-align: left;
+  padding: 8px 12px;
+}}
+QWidget#AdminScreen QFrame#admin_sidebar QPushButton#menu_worker_management:hover {{
+  background-color: {BG_BUTTON};
+}}
+QWidget#AdminScreen QFrame#admin_sidebar QPushButton#menu_worker_management:checked {{
+  background-color: {ACCENT_SOFT};
+  color: {ACCENT_HOVER};
+  font-weight: 600;
+}}
+QWidget#AdminScreen QFrame#admin_sidebar QPushButton#backButton {{
+  background-color: {BG_BUTTON};
+  color: {TEXT_PRIMARY};
+  border: 1px solid {BORDER};
+  border-radius: 6px;
+}}
+QWidget#AdminScreen QFrame#admin_sidebar QPushButton#backButton:hover {{
+  background-color: {BORDER};
+}}
+/* 작업자 관리 콘텐츠 */
+QWidget#AdminScreen QLabel#label_worker_management_title {{
+  color: {TEXT_PRIMARY};
+  font-size: 18px;
+  font-weight: bold;
+}}
+QWidget#AdminScreen QPushButton#addWorkerButton {{
+  background-color: {ACCENT};
+  color: white;
+  border: none;
+  min-height: 40px;
+  border-radius: 8px;
+  font-size: 13px;
+}}
+QWidget#AdminScreen QPushButton#addWorkerButton:hover {{
+  background-color: {ACCENT_HOVER};
+}}
+QWidget#AdminScreen QTableWidget {{
+  background-color: {BG_CARD};
+  border: 1px solid {BORDER};
+  border-radius: 8px;
+  gridline-color: {BORDER};
+}}
+QWidget#AdminScreen QTableWidget::item {{
+  padding: 8px 12px;
+  color: {TEXT_PRIMARY};
+}}
+QWidget#AdminScreen QTableWidget::item:selected {{
+  background-color: {ACCENT_SOFT};
+  color: {TEXT_PRIMARY};
+}}
+QWidget#AdminScreen QHeaderView::section {{
+  background-color: {BG_BUTTON};
+  color: {TEXT_SECONDARY};
+  padding: 10px 12px;
+  border: none;
+  border-bottom: 2px solid {BORDER};
+  border-right: 1px solid {BORDER};
+  font-weight: 600;
+}}
+QWidget#AdminScreen QHeaderView::section:last {{
+  border-right: none;
 }}
 """

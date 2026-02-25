@@ -21,13 +21,17 @@ services:
   soy-server:
     build: .
     ports:
-      - "8000:8000"
+      - "8000:8000"   # HTTP (health, root, docs)
+      - "9001:9001"   # TCP (Soy-PC: Worker CRUD, card_read 푸시)
     environment:
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       MYSQL_USER: soy
       MYSQL_PASSWORD: soy
       MYSQL_DATABASE: soydb
+      SOY_REGISTER_SERIAL_PORT: /dev/ttyUSB0
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
     depends_on:
       mysql:
         condition: service_healthy

@@ -17,7 +17,7 @@ AI 에이전트가 이 저장소에서 작업할 때 참고할 프로젝트 컨�
 | 경로 | 역할 | 스택 | 에이전트 작업 시 참고 |
 |------|------|------|------------------------|
 | `soy-server/` | 중앙서버 | Python 3.12, FastAPI, Alembic·SQLAlchemy | REST API·비동기·DB 연동. **Alembic은 soy-server/ 내부(soy-server/alembic/)에서 관리.** 스키마 변경 시 마이그레이션과 정합성 유지. |
-| `soy-pc/` | 관리자/작업자 UI (SoyAdmin) | PyQt6 | 화면별 `.ui`는 `soy-pc/ui/` 폴더 (`main_window.ui`, `lock_screen.ui`, `worker_screen.ui`, `admin_screen.ui`, `password_dialog.ui`) + `main.py`, `theme.py`. 루트의 `designer.py`로 UI 편집, `soy_pc.py`로 실행. SoyServer·카메라 UDP 연동. |
+| `soy-pc/` | 관리자/작업자 UI (SoyAdmin) | PyQt6 | `main.py`, `theme.py`, `ui/`(`.ui` 파일), `db/`(연결·admin·worker), `features/`(잠금·작업자·관리자 화면·관리자 등록). 루트의 `designer.py`로 UI 편집, `soy_pc.py`로 실행. SoyServer·카메라 UDP 연동. |
 | `soy-db/` | DB·인프라 | MySQL, Docker | 스키마·Docker 설정. 테이블 변경은 SoyServer 쪽 마이그레이션과 맞출 것. |
 | `soy-controller/` | 분류키트 | Arduino, ESP32CAM | QR 인식, 근접·서보·DC모터. **TCP**(분류 지시)·**UDP**(카메라). |
 | `access-controller/` | 출입제어키트 | Arduino, ESP32, RFID | 중앙서버와 **TCP** 통신. |
@@ -36,7 +36,7 @@ AI 에이전트가 이 저장소에서 작업할 때 참고할 프로젝트 컨�
 ```bash
 uv venv && uv sync                    # 프로젝트 세팅
 docker compose up -d                  # 서버·DB 기동
-uv run uvicorn app.main:app --app-dir soy-server --reload   # 서버만 로컬 실행
+uv run uvicorn app.main:app --app-dir soy-server --reload   # 서버 로컬 실행 (HTTP 8000, TCP 9001)
 uv run python designer.py             # Qt Designer (soy-pc/ui/*.ui 편집)
 uv run python soy_pc.py               # SoyAdmin 실행
 cd soy-server && uv run alembic upgrade head   # DB 마이그레이션 적용
