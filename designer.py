@@ -25,7 +25,7 @@ def main() -> int:
         print("  Linux: 패키지 관리자에서 qt6-tools-base 또는 qt5-tools 설치", file=sys.stderr)
         return 1
     root = os.path.dirname(os.path.abspath(__file__))
-    ui_path = os.path.join(root, "soy-pc", "soy-pc.ui")
+    ui_path = os.path.join(root, "soy-pc", "ui", "main_window.ui")
     return subprocess.run([designer, ui_path], cwd=root).returncode
 
 

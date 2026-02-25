@@ -74,7 +74,7 @@ docker compose up -d
 
 ### soy-pc (관리자 UI)
 
-- **UI 수정**: `designer.py`로 Qt Designer를 띄워 `soy-pc/soy-pc.ui`를 편집합니다. (Qt 설치 필요. macOS: `brew install qt`)
+- **UI 수정**: `designer.py`로 Qt Designer를 띄워 `soy-pc/ui/` 폴더의 `.ui` 파일(메인: `main_window.ui`, 화면별: `lock_screen.ui`, `worker_screen.ui`, `admin_screen.ui`, `password_dialog.ui`)을 편집합니다. (Qt 설치 필요. macOS: `brew install qt`)
 - **실행**: `soy_pc.py`로 SoyAdmin 앱을 실행합니다.
 
 ```bash

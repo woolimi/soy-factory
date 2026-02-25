@@ -11,16 +11,31 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>SoyAdmin</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QStackedLayout" name="stackedLayout">
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QWidget" name="page_lock" native="true"/>
+    </item>
+    <item>
+     <widget class="QWidget" name="page_worker" native="true"/>
+    </item>
+    <item>
+     <widget class="QWidget" name="page_admin" native="true"/>
+    </item>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>37</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
