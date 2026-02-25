@@ -7,10 +7,12 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 COPY soy-server/ ./soy-server/
 
-# pyproject.toml 기준 의존성 설치 (패키지 구조 없이 deps만)
-RUN pip install --no-cache-dir fastapi "uvicorn[standard]"
+# 서버 + 마이그레이션용 의존성 (pyproject.toml과 동기화)
+RUN pip install --no-cache-dir fastapi "uvicorn[standard]" alembic sqlalchemy pymysql
+
+RUN chmod +x /app/soy-server/entrypoint.sh
 
 EXPOSE 8000
 
-# DB 연결은 환경변수로 (MYSQL_HOST 등) Compose에서 주입
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "soy-server"]
+# 기동 시 마이그레이션 적용 후 uvicorn 실행
+CMD ["/app/soy-server/entrypoint.sh"]

@@ -1,0 +1,13 @@
+Alembic migrations for SoyServer (soydb).
+
+Run from soy-server directory:
+
+  uv run alembic upgrade head
+  uv run alembic revision -m "message"
+  uv run alembic downgrade -1
+
+Or from project root:
+
+  uv run alembic -c soy-server/alembic.ini upgrade head
+
+DB URL: SOY_DATABASE_URL or MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE.

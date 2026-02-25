@@ -7,5 +7,5 @@ services:
       MYSQL_USER: soy
       MYSQL_PASSWORD: soy
     ports:
-      - "3306:3306"
+      - "3333:3306"
     restart: unless-stopped

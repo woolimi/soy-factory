@@ -67,8 +67,10 @@ uv sync
 docker compose up -d
 ```
 
-- **MySQL**: `localhost:3306` (사용자 `soy` / 비밀번호 `soy`, DB `soydb`)
-- **SoyServer**: http://localhost:8000 (API 문서: http://localhost:8000/docs)
+- **MySQL**: `localhost:3333` (사용자 `soy` / 비밀번호 `soy`, DB `soydb`)
+- **SoyServer**: http://localhost:8000 (API 문서: http://localhost:8000/docs) — 기동 시 DB 마이그레이션 자동 적용
+- **Adminer** (DB 스키마 조회): http://localhost:8080 — 자동 로그인(soydb), 로컬/내부용만 사용 권장
+- 로컬에서 마이그레이션만 수동 실행: `cd soy-server && uv run alembic upgrade head` (상세는 [soy-db/README.md](soy-db/README.md) 참고)
 
 ### soy-pc (관리자 UI)
 

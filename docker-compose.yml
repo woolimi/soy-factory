@@ -10,7 +10,7 @@ services:
       MYSQL_USER: soy
       MYSQL_PASSWORD: soy
     ports:
-      - "3333:3333"
+      - "3333:3306"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-usoy", "-psoy"]
@@ -24,10 +24,25 @@ services:
       - "8000:8000"
     environment:
       MYSQL_HOST: mysql
-      MYSQL_PORT: 3333
+      MYSQL_PORT: 3306
       MYSQL_USER: soy
       MYSQL_PASSWORD: soy
       MYSQL_DATABASE: soydb
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  adminer:
+    image: msav/adminer-autologin:latest
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DRIVER: mysql
+      ADMINER_SERVER: mysql
+      ADMINER_USERNAME: soy
+      ADMINER_PASSWORD: soy
+      ADMINER_DB: soydb
     depends_on:
       mysql:
         condition: service_healthy
