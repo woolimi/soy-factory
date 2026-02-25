@@ -174,6 +174,49 @@ def main():
     window.page_worker.backButton.clicked.connect(back_to_lock)
     window.page_admin.backButton.clicked.connect(back_to_lock)
 
+    # ------------------ 관리자 모드: 작업자 등록 (목업) ------------------
+    def on_add_worker_clicked():
+        dialog = QDialog(window)
+        uic.loadUi(os.path.join(ui_dir, "worker_registration_dialog.ui"), dialog)
+        
+        def on_rfid_scanned():
+            # RFID 카드를 찍었다고 간주 (UI 활성화)
+            dialog.statusLabel.setText("카드 인식 완료. 작업자 이름을 입력하세요.")
+            dialog.workerNameEdit.setEnabled(True)
+            dialog.button_ok.setEnabled(True)
+            dialog.workerNameEdit.setFocus()
+            
+        dialog.rfidScanButton.clicked.connect(on_rfid_scanned)
+        
+        def try_accept():
+            name = dialog.workerNameEdit.text().strip()
+            if not name:
+                QMessageBox.warning(
+                    dialog,
+                    "입력 오류",
+                    "작업자 이름을 입력하세요.",
+                    QMessageBox.StandardButton.Ok
+                )
+                dialog.workerNameEdit.setFocus()
+                return
+            
+            # 카드 데이터에 씌우는 동작은 목업이므로 팝업 메시지로 대체
+            QMessageBox.information(
+                dialog,
+                "등록 완료",
+                f"작업자 '{name}'의 정보가 RFID 카드에 등록되었습니다.",
+                QMessageBox.StandardButton.Ok
+            )
+            dialog.accept()
+            
+        dialog.button_ok.clicked.connect(try_accept)
+        dialog.button_cancel.clicked.connect(dialog.reject)
+        dialog.workerNameEdit.returnPressed.connect(try_accept)
+        
+        dialog.exec()
+
+    window.page_admin.addWorkerButton.clicked.connect(on_add_worker_clicked)
+
     window.show()
     sys.exit(app.exec())
 
